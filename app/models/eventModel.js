@@ -1,28 +1,10 @@
 'use strict'
 
-var db = require('./../../db');
-
-var Event = function(event) {
-    // tbl event
-    // ID_DISCIPLINE, ID_SITE, EPREUVE, EVENT_DATE
-    this.discipline = event.discipline;
-    this.epreuve = event.epreuve;
-    this.event_date = event.event_date;
-    // tbl event_has_pays
-    // ID_EVENT, ID_PAYS
-    // tbl pays
-    // NAME
-    this.participant = event.participant;
-    // tbl site
-    // NAME, COMMUNE, LONGITUDE, LATTITUDE
-    this.commune = event.commune;
-    this.site = event.site;
-    this.latittude = event.latittude;
-    this.longitude = event.longitude;
-}
+const db = require('./../../db');
+const oEvent = require('./../classes/Event');
 
 // All Events
-Event.getAllEvents = function(result) {
+oEvent.getAllEvents = function(result) {
     let sql = "SELECT e.ID_EVENT, d.NAME as discipline, p.name as participant, e.EPREUVE, e.EVENT_DATE, s.COMMUNE, s.LONGITUDE, s.LATTITUDE FROM `events` AS e ";
     sql += "INNER JOIN discipline AS d ";
     sql += "ON e.ID_DISCIPLINE = d.ID_DISCIPLINE ";
@@ -93,8 +75,8 @@ function rewriteEvents(matrice) {
 }
 
 // Create an event
-Event.createEvent = (newEvent, result) => {
-    console.log('Model: ', newEvent);
+oEvent.createEvent = (newEvent, result) => {
+    var discipline_id = 0;
     // @todo Test if events already exists
     // Test si discipline existe 
     db.query("SELECT ID_DISCIPLINE, COUNT(*) as nb FROM discipline WHERE NAME='" + newEvent.discipline + "'", function(err, res, fields) {
@@ -102,11 +84,9 @@ Event.createEvent = (newEvent, result) => {
             result(err, null);
         } else {
             let ret = Object.values(JSON.parse(JSON.stringify(res)));
-            var discipline_id = 0;
-            // console.log('ret: ', ret);
+            // var discipline_id = 0;
             if (ret && ret[0].nb == 1) {
                 // La discipline existe déjà
-                // result(null, ret);
                 discipline_id = ret[0].ID_DISCIPLINE;
             } else {
                 // La discipline n'existe pas
@@ -114,18 +94,15 @@ Event.createEvent = (newEvent, result) => {
                     if (err) {
                         result(err, null);
                     } else {
-                        // result(null, res.insertId);
-                        // console.log('insert: ', res);
-                        // console.log('insertId: ', res.insertId);
                         discipline_id = res.insertId;
-                        // console.log(discipline_id);
-                        // return res.insertId;
+                        console.log('before: ', discipline_id);
                     }
                 })
+                console.log('discipline_id1: ', discipline_id);
             }
-            console.log('discipline_id: ', discipline_id);
+            console.log('discipline_id2: ', discipline_id);
         }
     });
 }
 
-module.exports = Event;
+module.exports = oEvent;

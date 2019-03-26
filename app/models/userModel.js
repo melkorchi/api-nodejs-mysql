@@ -41,7 +41,7 @@ User.createUser = function(newUser, result) {
                 // result(null, ret[0].nb);
                 result(null, ret);
             } else {
-                // Emal is not used
+                // Email is not used
                 db.query("INSERT INTO users set ?", newUser, function(err, res) {
                     // console.log('insert: ' + res);
                     if (err) {

@@ -1,9 +1,6 @@
 'use strict'
 
-var Event = require('../models/eventModel.js');
-
-// Cryptage du mot de passe
-// var bcryptjs = require('bcryptjs');
+const Event = require('../models/eventModel.js');
 
 // JWT
 // var jwt = require('jsonwebtoken');
@@ -27,10 +24,12 @@ exports.new = (req, res) => {
     // console.log('Controller: ', newEvent);
     Event.createEvent(newEvent, (err, data) => {
         if (err) {
-            console.log('error no data');
+            console.log(err);
+            res.send(err);
         }
         if (data) {
-            console.log('data OK');
+            console.log(data);
+            res.send(data);
         }
     });
 }
