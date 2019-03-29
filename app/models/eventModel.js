@@ -38,94 +38,92 @@ Event.getAllEvents = function(result) {
 
     db.query(sql, function(err, res, fields) {
         if (err) {
-            console.log("error: ", err);
             result(err, null);
         } else {
             let ret = Object.values(JSON.parse(JSON.stringify(res)));
-            // console.log(ret);
-            result(null, rewriteEvents(ret));
+            result(null, groupById(ret));
+
         }
     });
 };
 
-function setDatas(tab, obj) {
-    obj.id_event = tab.ID_EVENT;
-    obj.discipline = tab.discipline;
-    obj.epreuve = tab.EPREUVE;
-    obj.event_date = tab.EVENT_DATE;
-    obj.commune = tab.COMMUNE;
-    obj.long = tab.LONGITUDE;
-    obj.lat = tab.LATTITUDE;
-    obj.participants = [];
-    obj.participants.push(tab.participant);
+function groupById(table) {
+    let groups = {};
+    table.forEach((item) => {
+        if (groups.hasOwnProperty(item.ID_EVENT)) {
+            groups[item.ID_EVENT].participants.push(item.participant);
+        } else {
+            groups[item.ID_EVENT] = item;
+            groups[item.ID_EVENT].participants = [item.participant];
+        }
+    });
+    return Object.values(groups);
 }
 
-function rewriteEvents(matrice) {
-    let aEvents = [];
-    let event = {
-        id_event: 0,
-        discipline: '',
-        epreuve: '',
-        event_date: '',
-        commune: '',
-        long: 0,
-        lat: 0,
-        participants: []
-    };
-    for (let i = 0; i < matrice.length; i++) {
-        if (i == 0) {
-            setDatas(matrice[i], event);
-        } else {
-            if (matrice[i].ID_EVENT == event.id_event) {
-                event.participants.push(matrice[i].participant);
-                if (i == matrice.length - 1) {
-                    aEvents.push(event);
-                }
-            } else {
-                aEvents.push(event);
-                event = {};
-                setDatas(matrice[i], event);
-            }
-        }
-    }
-    // console.log(aEvents);
-    return aEvents;
-}
+
+
+// Utiliser un orm ....
 
 // Create an event
-Event.createEvent = (newEvent, result) => {
-    console.log('Model: ', newEvent);
-    // @todo Test if events already exists
-    // Test si discipline existe 
-    db.query("SELECT ID_DISCIPLINE, COUNT(*) as nb FROM discipline WHERE NAME='" + newEvent.discipline + "'", function(err, res, fields) {
-        if (err) {
-            result(err, null);
+
+Event.insertDisciplineIfNotExists = (newEvent, callback) => {
+    // db.query("SELECT ID_DISCIPLINE discipline WHERE NAME = ?", [newEvent.discipline], function(err, res, fields) {
+    db.query("SELECT ID_DISCIPLINE as id FROM discipline WHERE NAME='" + newEvent.discipline + "'", function(err, res, fields) {
+        if (err) callback(err, null);
+        if (res.length == 0) {
+            db.query("INSERT INTO discipline (NAME) VALUES ('" + newEvent.discipline + "')", (err, res) => {
+                if (err) callback(err, null);
+                callback(null, JSON.parse(JSON.stringify(res)).insertId);
+            });
         } else {
-            let ret = Object.values(JSON.parse(JSON.stringify(res)));
-            var discipline_id = 0;
-            // console.log('ret: ', ret);
-            if (ret && ret[0].nb == 1) {
-                // La discipline existe déjà
-                // result(null, ret);
-                discipline_id = ret[0].ID_DISCIPLINE;
-            } else {
-                // La discipline n'existe pas
-                db.query("INSERT INTO discipline (NAME) VALUES ('" + newEvent.discipline + "')", function(err, res) {
-                    if (err) {
-                        result(err, null);
-                    } else {
-                        // result(null, res.insertId);
-                        // console.log('insert: ', res);
-                        // console.log('insertId: ', res.insertId);
-                        discipline_id = res.insertId;
-                        // console.log(discipline_id);
-                        // return res.insertId;
-                    }
-                })
-            }
-            console.log('discipline_id: ', discipline_id);
+            callback(null, res[0].id);
         }
     });
 }
+
+Event.insertSiteIfNoExists = (newEvent, callback) => {
+    db.query("SELECT ID_SITE as id FROM sites WHERE NAME='" + newEvent.site + "'", function(err, res, fields) {
+        if (err) callback(err, null);
+        if (res.length == 0) {
+            db.query("INSERT INTO sites (NAME, COMMUNE, LATTITUDE, LONGITUDE) VALUES ('" + newEvent.site + "', '" + newEvent.commune + "', '" + newEvent.latittude + "', '" + newEvent.longitude + "')", (err, res) => {
+                if (err) callback(err, null);
+                callback(null, JSON.parse(JSON.stringify(res)).insertId);
+            });
+        } else {
+            callback(null, res[0].id);
+        }
+    });
+}
+
+Event.insertEvent = (newEvent, callback) => {
+    db.query("INSERT INTO events (ID_DISCIPLINE, ID_SITE, EPREUVE, EVENT_DATE) VALUES ('" + newEvent.discipline_id + "', '" + newEvent.site_id + "', '" + newEvent.epreuve + "', '" + newEvent.event_date + "')", (err, res) => {
+        if (err) callback(err, null);
+        callback(null, JSON.parse(JSON.stringify(res)).insertId);
+    });
+}
+
+Event.insertPaysIfNotExists = (newEvent, callback) => {
+    db.query("SELECT ID_PAYS as id FROM pays WHERE NAME='" + newEvent.participant + "'", function(err, res, fields) {
+        if (err) callback(err, null);
+        if (res.length == 0) {
+            db.query("INSERT INTO pays (NAME) VALUES ('" + newEvent.participant + "')", (err, res) => {
+                if (err) callback(err, null);
+                callback(null, JSON.parse(JSON.stringify(res)).insertId);
+            });
+        } else {
+            callback(null, res[0].id);
+        }
+    });
+}
+
+Event.insertInEventHasPays = (newEvent, callback) => {
+    db.query("INSERT INTO event_has_pays (ID_EVENT, ID_PAYS) VALUES ('" + newEvent.event_id + "', '" + newEvent.pays_id + "')", (err, res) => {
+        if (err) callback(err, null);
+        callback(null, JSON.parse(JSON.stringify(res)).insertId);
+    });
+}
+
+
+
 
 module.exports = Event;
