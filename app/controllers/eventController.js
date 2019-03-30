@@ -1,6 +1,9 @@
 'use strict'
 
-const Event = require('../models/eventModel.js');
+var Event = require('../models/eventModel.js');
+
+// Cryptage du mot de passe
+// var bcryptjs = require('bcryptjs');
 
 // JWT
 // var jwt = require('jsonwebtoken');

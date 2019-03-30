@@ -1,10 +1,28 @@
 'use strict'
 
-const db = require('./../../db');
-const oEvent = require('./../classes/Event');
+var db = require('./../../db');
+
+var Event = function(event) {
+    // tbl event
+    // ID_DISCIPLINE, ID_SITE, EPREUVE, EVENT_DATE
+    this.discipline = event.discipline;
+    this.epreuve = event.epreuve;
+    this.event_date = event.event_date;
+    // tbl event_has_pays
+    // ID_EVENT, ID_PAYS
+    // tbl pays
+    // NAME
+    this.participant = event.participant;
+    // tbl site
+    // NAME, COMMUNE, LONGITUDE, LATTITUDE
+    this.commune = event.commune;
+    this.site = event.site;
+    this.latittude = event.latittude;
+    this.longitude = event.longitude;
+}
 
 // All Events
-oEvent.getAllEvents = function(result) {
+Event.getAllEvents = function(result) {
     let sql = "SELECT e.ID_EVENT, d.NAME as discipline, p.name as participant, e.EPREUVE, e.EVENT_DATE, s.COMMUNE, s.LONGITUDE, s.LATTITUDE FROM `events` AS e ";
     sql += "INNER JOIN discipline AS d ";
     sql += "ON e.ID_DISCIPLINE = d.ID_DISCIPLINE ";
@@ -41,6 +59,8 @@ function groupById(table) {
     });
     return Object.values(groups);
 }
+
+
 
 // Utiliser un orm ....
 
@@ -102,6 +122,8 @@ Event.insertInEventHasPays = (newEvent, callback) => {
         callback(null, JSON.parse(JSON.stringify(res)).insertId);
     });
 }
+
+
 
 
 module.exports = Event;
