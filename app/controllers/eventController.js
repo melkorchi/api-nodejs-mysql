@@ -10,8 +10,8 @@ var Event = require('../models/eventModel.js');
 // var config = require('./../../config');
 
 // EndPoint /events (get) : handle retrieve all events
-exports.index = function(req, res) {
-    Event.getAllEvents(function(err, data) {
+exports.index = (req, res) => {
+    Event.getAllEvents((err, data) => {
         if (err) {
             res.send(err);
         } else {

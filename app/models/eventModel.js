@@ -22,7 +22,7 @@ var Event = function(event) {
 }
 
 // All Events
-Event.getAllEvents = function(result) {
+Event.getAllEvents = (callback) => {
     let sql = "SELECT e.ID_EVENT, d.NAME as discipline, p.name as participant, e.EPREUVE, e.EVENT_DATE, s.COMMUNE, s.LONGITUDE, s.LATTITUDE FROM `events` AS e ";
     sql += "INNER JOIN discipline AS d ";
     sql += "ON e.ID_DISCIPLINE = d.ID_DISCIPLINE ";
@@ -34,14 +34,12 @@ Event.getAllEvents = function(result) {
     sql += "ON e.ID_SITE = s.ID_SITE ";
     sql += "ORDER BY e.ID_EVENT ASC";
 
-    // let sql2 = "SELECT * FROM events";
-
-    db.query(sql, function(err, res, fields) {
+    db.query(sql, (err, res, fields) => {
         if (err) {
-            result(err, null);
+            callback(err, null);
         } else {
             let ret = Object.values(JSON.parse(JSON.stringify(res)));
-            result(null, groupById(ret));
+            callback(null, groupById(ret));
 
         }
     });
@@ -59,10 +57,6 @@ function groupById(table) {
     });
     return Object.values(groups);
 }
-
-
-
-// Utiliser un orm ....
 
 // Create an event
 
@@ -122,8 +116,5 @@ Event.insertInEventHasPays = (newEvent, callback) => {
         callback(null, JSON.parse(JSON.stringify(res)).insertId);
     });
 }
-
-
-
 
 module.exports = Event;

@@ -64,3 +64,5 @@ INNER JOIN event_has_pays AS ehp
 ON e.ID_EVENT = ehp.ID_EVENT
 INNER JOIN pays AS p
 ON ehp.ID_PAYS = p.ID_PAYS
+
+--
