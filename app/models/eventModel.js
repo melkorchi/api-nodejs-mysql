@@ -42,8 +42,6 @@ function groupById(table) {
     return Object.values(groups);
 }
 
-
-
 // Utiliser un orm ....
 
 // Create an event
@@ -63,35 +61,6 @@ Event.insertDisciplineIfNotExists = (newEvent, callback) => {
     });
 }
 
-<<<<<<< HEAD
-// Create an event
-oEvent.createEvent = (newEvent, result) => {
-    var discipline_id = 0;
-    // @todo Test if events already exists
-    // Test si discipline existe 
-    db.query("SELECT ID_DISCIPLINE, COUNT(*) as nb FROM discipline WHERE NAME='" + newEvent.discipline + "'", function(err, res, fields) {
-        if (err) {
-            result(err, null);
-        } else {
-            let ret = Object.values(JSON.parse(JSON.stringify(res)));
-            // var discipline_id = 0;
-            if (ret && ret[0].nb == 1) {
-                // La discipline existe déjà
-                discipline_id = ret[0].ID_DISCIPLINE;
-            } else {
-                // La discipline n'existe pas
-                db.query("INSERT INTO discipline (NAME) VALUES ('" + newEvent.discipline + "')", function(err, res) {
-                    if (err) {
-                        result(err, null);
-                    } else {
-                        discipline_id = res.insertId;
-                        console.log('before: ', discipline_id);
-                    }
-                })
-                console.log('discipline_id1: ', discipline_id);
-            }
-            console.log('discipline_id2: ', discipline_id);
-=======
 Event.insertSiteIfNoExists = (newEvent, callback) => {
     db.query("SELECT ID_SITE as id FROM sites WHERE NAME='" + newEvent.site + "'", function(err, res, fields) {
         if (err) callback(err, null);
@@ -102,14 +71,10 @@ Event.insertSiteIfNoExists = (newEvent, callback) => {
             });
         } else {
             callback(null, res[0].id);
->>>>>>> origin/master
         }
     });
 }
 
-<<<<<<< HEAD
-module.exports = oEvent;
-=======
 Event.insertEvent = (newEvent, callback) => {
     db.query("INSERT INTO events (ID_DISCIPLINE, ID_SITE, EPREUVE, EVENT_DATE) VALUES ('" + newEvent.discipline_id + "', '" + newEvent.site_id + "', '" + newEvent.epreuve + "', '" + newEvent.event_date + "')", (err, res) => {
         if (err) callback(err, null);
@@ -139,7 +104,4 @@ Event.insertInEventHasPays = (newEvent, callback) => {
 }
 
 
-
-
 module.exports = Event;
->>>>>>> origin/master

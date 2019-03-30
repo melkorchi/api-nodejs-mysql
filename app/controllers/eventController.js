@@ -18,20 +18,6 @@ exports.index = function(req, res) {
 };
 
 // EndPoint /events (post) : handle create a new event
-<<<<<<< HEAD
-exports.new = (req, res) => {
-    // console.log(req.body);
-    let newEvent = new Event(req.body);
-    // console.log('Controller: ', newEvent);
-    Event.createEvent(newEvent, (err, data) => {
-        if (err) {
-            console.log(err);
-            res.send(err);
-        }
-        if (data) {
-            console.log(data);
-            res.send(data);
-=======
 exports.new = (request, response) => {
     let newEvent = new Event(request.body);
     Event.insertDisciplineIfNotExists(newEvent, (err, id) => {
@@ -69,7 +55,6 @@ exports.new = (request, response) => {
                     });
                 }
             });
->>>>>>> origin/master
         }
     });
 }
