@@ -1,12 +1,11 @@
 'use strict';
 
 module.exports = (app) => {
-
-    app.get('/', (req, res) => res.send('Welcome to ECS_REST_API with Express'));
-
     var verifToken = require('./../middlewares/verifToken');
-
     var userController = require('./../controllers/userController');
+    var eventController = require('./../controllers/eventController');
+
+    app.get('/', (req, res) => res.send('Welcome to Api-JO'));
 
     app.route('/users')
         .get(userController.getAllUsers)
@@ -20,9 +19,7 @@ module.exports = (app) => {
     app.route('/login')
         .post(userController.login);
 
-    var eventController = require('./../controllers/eventController');
     app.route('/events')
-        // .get(verifToken, eventController.index)
         .get(verifToken, eventController.getAllEvents)
         .post(eventController.new);
 
@@ -30,5 +27,4 @@ module.exports = (app) => {
         .get(eventController.viewEvent)
         .post(eventController.updateEvent)
         .delete(eventController.deleteEvent);
-
 }

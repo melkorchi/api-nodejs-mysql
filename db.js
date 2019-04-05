@@ -1,25 +1,22 @@
 'user strict';
 
-var mysql = require('mysql');
+let mysql = require('mysql');
 
-//local mysql db connection
-// var dbLink = mysql.createConnection(process.env.CLEARDB_DATABASE_URL);
+// let dbLink = mysql.createConnection(process.env.CLEARDB_DATABASE_URL);
+// Utilisation de createPool Heroku
+// let dbLink = mysql.createPool(process.env.CLEARDB_DATABASE_URL);
 
-// Utilisation de createPool
-var dbLink = mysql.createPool(process.env.CLEARDB_DATABASE_URL);
 
-/*
-var dbLink = mysql.createConnection({
+let dbLink = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
     database: 'jo2024'
-        // port: '3000'
 });
-*/
 
-// dbLink.connect(function(err) {
-dbLink.getConnection(function(err, connection) {
+
+dbLink.connect(function(err) {
+    // dbLink.getConnection(function(err, connection) {
     if (err) {
         console.log('errrrrrrr');
         throw err;
@@ -27,5 +24,6 @@ dbLink.getConnection(function(err, connection) {
         console.log('lets go !!!');
     }
 });
+
 
 module.exports = dbLink;

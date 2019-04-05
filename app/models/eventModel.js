@@ -3,7 +3,11 @@
 // import { groupById, ObjectFilter } from './../utils/fctUtils';
 // import * as lib from './../utils/fctUtils';
 
-var db = require('./../../db');
+// var db = require('./../../db');
+const DataBaseConnection = require('./../../db2');
+const con = new DataBaseConnection('heroku');
+con.getConnection();
+const db = con.dbLink();
 
 var SqlString = require('sqlstring');
 
@@ -64,7 +68,6 @@ function groupById(table) {
 }
 
 // Create an event
-
 Event.insertDisciplineIfNotExists = (newEvent, callback) => {
     // db.query("SELECT ID_DISCIPLINE discipline WHERE NAME = ?", [newEvent.discipline], function(err, res, fields) {
     db.query("SELECT ID_DISCIPLINE as id FROM discipline WHERE NAME='" + newEvent.discipline + "'", function(err, res, fields) {
@@ -147,35 +150,33 @@ Event.getEventById = (id, callback) => {
     });
 }
 
-// Event.updateEventById = (id, event, callback) => {
 Event.updateEventById = (id, obj, callback) => {
-    // let filtered = Object.filter(event, value => value != undefined);
-    // console.log('filtered', filtered);
     // @todo manage dates
-    // let aValues = Object.values(filtered);
-    // aValues.push(id);
-    // let aKeys = Object.keys(filtered);
-    // aKeys.push('id');
-    // console.log('keys', aKeys);
-    // console.log('values', aValues);
-    //  ID_DISCIPLINE, ID_SITE, EPREUVE, EVENT_DATE
-    // let sql = "UPDATE events SET ID_DISCIPLINE = ?, ID_SITE = ?, EPREUVE = ?, EVENT_DATE = ? WHERE ID_EVENT = ?";
-    // let sql = "UPDATE events SET ?, ID_SITE = ?, EPREUVE = ?, EVENT_DATE = ? WHERE ID_EVENT = ?";
-
     // Utilisation de sqlstring
-    // let sql = SqlString.format('UPDATE ?? SET ? WHERE `id` = ?', ['events', filtered, id]);
-    // let event =
-    let sql = SqlString.format('UPDATE ?? SET ? WHERE `id` = ?', ['events', obj, id]);
+    let aPays = obj.PAYS_ID.split(',');
+    delete obj.PAYS_ID;
+    let sql = SqlString.format('UPDATE ?? SET ? WHERE `ID_EVENT` = ?', ['events', obj, id]);
     console.log('sql', sql);
 
-    // db.query(sql, values, (err, res) => {
-    //     if (err) {
-    //         callback(err, null);
-    //     } else {
-    //         console.log('update: ', res);
-    //         callback(null, res);
-    //     }
-    // });
+    db.query(sql, (err, res) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            // Mettre à jour les pays participants
+            db.query("DELETE FROM event_has_pays WHERE ID_EVENT=?", id, (err, res) => {
+                if (err) {
+                    callback(err, null);
+                } else {
+                    aPays.forEach((item) => {
+                        db.query("INSERT INTO event_has_pays (ID_EVENT, ID_PAYS) VALUES ('" + id + "', '" + item + "')", (err, res) => {
+                            if (err) callback(err, null);
+                        });
+                    });
+                    callback(null, 'UPDATE OK');
+                }
+            });
+        }
+    });
 }
 
 Event.removeEventById = (id, callback) => {
@@ -198,5 +199,7 @@ Object.filter = (obj, fn) =>
     Object.keys(obj)
     .filter(key => fn(obj[key]))
     .reduce((res, key) => (res[key] = obj[key], res), {});
+
+// let filtered = Object.filter(event, value => value != undefined);
 
 module.exports = Event;

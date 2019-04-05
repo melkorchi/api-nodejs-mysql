@@ -18,12 +18,12 @@
          this.longitude = event.longitude;
      }
 
-     static insert(event, callback) {
-         db.query(sql, values, (err, result) => {
-             if (err) throw err;
-             callback(result);
-         });
-     }
+     //  static insert(event, callback) {
+     //      db.query(sql, values, (err, result) => {
+     //          if (err) throw err;
+     //          callback(result);
+     //      });
+     //  }
 
  }
 

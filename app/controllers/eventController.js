@@ -74,9 +74,9 @@ exports.updateEvent = (request, response) => {
     // let eventUpdated = new Event(request.body);
     // console.log('eventUpdated', eventUpdated);
     // Event.updateEventById(request.params.id, eventUpdated, (err, user) => {
-    Event.updateEventById(request.params.id, request.body, (err, user) => {
+    Event.updateEventById(request.params.id, request.body, (err, event) => {
         if (err) sendJson(response, 500, err);
-        sendJson(response, 200, user);
+        sendJson(response, 200, event);
     });
 };
 

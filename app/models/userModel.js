@@ -1,6 +1,10 @@
 'use strict'
 
-var db = require('./../../db');
+// var db = require('./../../db');
+const DataBaseConnection = require('./../../db2');
+const con = new DataBaseConnection('heroku');
+con.getConnection();
+const db = con.dbLink();
 
 var User = function(user) {
     this.firstname = user.firstname;
