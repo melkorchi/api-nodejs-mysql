@@ -63,7 +63,7 @@ module.exports = class MySqlDataBase {
                 }
             });
         } else {
-            dbLink.getConnection(function(err, connection) {
+            this._dblink.getConnection(function(err, connection) {
                 if (err) {
                     console.log('errrrrrrr');
                     throw err;
