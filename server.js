@@ -2,28 +2,6 @@ const express = require('express'),
     app = express(),
     bodyParser = require('body-parser'),
     port = process.env.PORT || 8080;
-// port = process.env.PORT || 3306;
-
-// const mysql = require('mysql');
-
-// // connection configurations
-// const dbLink = mysql.createConnection({
-//     host: 'localhost',
-//     user: 'root',
-//     password: '',
-//     // database: 'todolist'
-//     database: 'apijo'
-// });
-
-// // connect to database
-// dbLink.connect(function(err) {
-//     if (err) {
-//         console.log('Error: ' + err);
-//         throw err;
-//     } else {
-//         console.log('let\'s go');
-//     }
-// });
 
 app.listen(port);
 

@@ -7,6 +7,7 @@ module.exports = (app) => {
     var verifToken = require('./../middlewares/verifToken');
 
     var userController = require('./../controllers/userController');
+
     app.route('/users')
         .get(userController.getAllUsers)
         .post(userController.register);
