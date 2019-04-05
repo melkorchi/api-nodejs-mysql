@@ -1,6 +1,11 @@
 'use strict'
 
+// import { groupById, ObjectFilter } from './../utils/fctUtils';
+// import * as lib from './../utils/fctUtils';
+
 var db = require('./../../db');
+
+var SqlString = require('sqlstring');
 
 var Event = function(event) {
     // tbl event
@@ -97,16 +102,21 @@ Event.insertEvent = (newEvent, callback) => {
 }
 
 Event.insertPaysIfNotExists = (newEvent, callback) => {
-    db.query("SELECT ID_PAYS as id FROM pays WHERE NAME='" + newEvent.participant + "'", function(err, res, fields) {
-        if (err) callback(err, null);
-        if (res.length == 0) {
-            db.query("INSERT INTO pays (NAME) VALUES ('" + newEvent.participant + "')", (err, res) => {
-                if (err) callback(err, null);
-                callback(null, JSON.parse(JSON.stringify(res)).insertId);
-            });
-        } else {
-            callback(null, res[0].id);
-        }
+    let aPays = newEvent.participant.split(",");
+    let oPays = {};
+    console.log(aPays);
+    aPays.forEach((element) => {
+        db.query("SELECT ID_PAYS as id FROM pays WHERE NAME='" + element + "'", (err, res, fields) => {
+            if (err) callback(err, null);
+            if (res.length == 0) {
+                db.query("INSERT INTO pays (NAME) VALUES ('" + element + "')", (err, res) => {
+                    if (err) callback(err, null);
+                    callback(null, JSON.parse(JSON.stringify(res)).insertId);
+                });
+            } else {
+                callback(null, res[0].id);
+            }
+        });
     });
 }
 
@@ -116,5 +126,76 @@ Event.insertInEventHasPays = (newEvent, callback) => {
         callback(null, JSON.parse(JSON.stringify(res)).insertId);
     });
 }
+
+Event.getEventById = (id, callback) => {
+    let sqlG = "SELECT e.ID_EVENT, d.NAME as discipline, p.name as participant, e.EPREUVE, e.EVENT_DATE, s.NAME, s.COMMUNE, s.LONGITUDE, s.LATTITUDE FROM `events` AS e ";
+    sqlG += "INNER JOIN discipline AS d ";
+    sqlG += "ON e.ID_DISCIPLINE = d.ID_DISCIPLINE ";
+    sqlG += "INNER JOIN event_has_pays AS ehp ";
+    sqlG += "ON e.ID_EVENT = ehp.ID_EVENT ";
+    sqlG += "INNER JOIN pays AS p ";
+    sqlG += "ON ehp.ID_PAYS = p.ID_PAYS ";
+    sqlG += "INNER JOIN sites AS s ";
+    sqlG += "ON e.ID_SITE = s.ID_SITE ";
+    sqlG += "WHERE e.ID_EVENT = ?";
+    db.query(sqlG, id, (err, res) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            callback(null, groupById(res));
+        }
+    });
+}
+
+// Event.updateEventById = (id, event, callback) => {
+Event.updateEventById = (id, obj, callback) => {
+    // let filtered = Object.filter(event, value => value != undefined);
+    // console.log('filtered', filtered);
+    // @todo manage dates
+    // let aValues = Object.values(filtered);
+    // aValues.push(id);
+    // let aKeys = Object.keys(filtered);
+    // aKeys.push('id');
+    // console.log('keys', aKeys);
+    // console.log('values', aValues);
+    //  ID_DISCIPLINE, ID_SITE, EPREUVE, EVENT_DATE
+    // let sql = "UPDATE events SET ID_DISCIPLINE = ?, ID_SITE = ?, EPREUVE = ?, EVENT_DATE = ? WHERE ID_EVENT = ?";
+    // let sql = "UPDATE events SET ?, ID_SITE = ?, EPREUVE = ?, EVENT_DATE = ? WHERE ID_EVENT = ?";
+
+    // Utilisation de sqlstring
+    // let sql = SqlString.format('UPDATE ?? SET ? WHERE `id` = ?', ['events', filtered, id]);
+    let sql = SqlString.format('UPDATE ?? SET ? WHERE `id` = ?', ['events', obj, id]);
+    console.log('sql', sql);
+
+    // db.query(sql, values, (err, res) => {
+    //     if (err) {
+    //         callback(err, null);
+    //     } else {
+    //         console.log('update: ', res);
+    //         callback(null, res);
+    //     }
+    // });
+}
+
+Event.removeEventById = (id, callback) => {
+    db.query("DELETE FROM events WHERE ID_EVENT=?", id, (err, res) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            db.query("DELETE FROM event_has_pays WHERE ID_EVENT=?", id, (err, res) => {
+                if (err) {
+                    callback(err, null);
+                } else {
+                    callback(null, res.affectedRows);
+                }
+            });
+        }
+    });
+}
+
+Object.filter = (obj, fn) =>
+    Object.keys(obj)
+    .filter(key => fn(obj[key]))
+    .reduce((res, key) => (res[key] = obj[key], res), {});
 
 module.exports = Event;

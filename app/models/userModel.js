@@ -14,40 +14,35 @@ var User = function(user) {
 }
 
 // All users
-User.getUsers = function(result) {
-    db.query("Select * from users", function(err, res, fields) {
+User.getAllUsers = (callback) => {
+    db.query("Select * from users", (err, res, fields) => {
         if (err) {
-            console.log("error: ", err);
-            result(err, null);
+            callback(err, null);
         } else {
-            console.log('users : ', res);
-            result(null, res);
+            callback(null, res);
         }
     });
 };
 
-// Register a user (create)
-User.createUser = function(newUser, result) {
-    // console.log(newUser);
+// Register an user 
+User.register = (newUser, callback) => {
     // Test if email is already used
-    db.query("SELECT COUNT(*) as nb FROM users WHERE email='" + newUser.email + "'", function(err, res, fields) {
+    db.query("SELECT COUNT(*) as nb FROM users WHERE email='" + newUser.email + "'", (err, res, fields) => {
         if (err) {
-            result(err, null);
+            callback(err, null);
         } else {
             let ret = Object.values(JSON.parse(JSON.stringify(res)));
             if (ret && ret[0].nb == 1) {
                 // Email is already used
-                // console.log('ret: ', ret);
-                // result(null, ret[0].nb);
-                result(null, ret);
+                // callback(null, ret[0].nb);
+                callback(null, ret);
             } else {
                 // Email is not used
                 db.query("INSERT INTO users set ?", newUser, function(err, res) {
-                    // console.log('insert: ' + res);
                     if (err) {
-                        result(err, null);
+                        callback(err, null);
                     } else {
-                        result(null, res.insertId);
+                        callback(null, res.insertId);
                     }
                 });
             }
@@ -55,32 +50,52 @@ User.createUser = function(newUser, result) {
     });
 };
 
-// Login
-User.login = function(email, password, result) {
-    db.query("SELECT * FROM users WHERE email='" + email + "'", function(err, res, fields) {
+// Retrieve an user
+User.getUserById = (id, callback) => {
+    db.query("SELECT * FROM users WHERE id='" + id + "'", (err, res, fields) => {
         if (err) {
-            result(err, null);
+            callback(err, null);
         } else {
-            // console.log('res: ', res);
-            let ret = Object.values(JSON.parse(JSON.stringify(res)));
-            // console.log('ret: ', ret);
-            // You have to test the result 
-            if (res.length > 0) {
-                // console.log('not empty');
-                // Case ret is not an empty array
-                // The user was retrieve
-                // console.log('on peut vérifier le mdp');
-                // console.log('mdp: ', password);
+            callback(null, Object.values(JSON.parse(JSON.stringify(res))));
+        }
+    });
+}
 
-                // result(null, ret);
-            } else {
-                // console.log('empty');
-                // Case ret is an empty array
-                // The user was not retrieved
+User.updateUserById = (id, user, callback) => {
+    let values = Object.values(user);
+    values.push(id);
+    console.log('values', values);
+    let sql = "UPDATE users SET firstname = ?, lastname =  ?, email = ?, password = ?, status = ?, avatar = ?, createdAt = ?, updatedAt = ? WHERE id = ?";
+    // let sql = "UPDATE users SET ? WHERE id = ?";
+    db.query(sql, values, (err, res) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            console.log('update: ', res);
+            callback(null, res);
+        }
+    });
+}
 
-                // result(null, ret);
-            }
-            result(null, ret);
+User.removeUserById = (id, callback) => {
+    db.query("DELETE FROM users WHERE id='" + id + "'", (err, res) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            // callback(null, Object.values(JSON.parse(JSON.stringify(res.affectedRows))));
+            callback(null, res.affectedRows);
+            console.log('delete: ', res.affectedRows);
+        }
+    });
+}
+
+// Login
+User.login = (email, password, callback) => {
+    db.query("SELECT * FROM users WHERE email='" + email + "'", (err, res) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            callback(null, Object.values(JSON.parse(JSON.stringify(res))));
         }
     });
 };

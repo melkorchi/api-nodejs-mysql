@@ -1,35 +1,31 @@
 'use strict';
 
-module.exports = function(app) {
-    // var todoList = require('../controllers/appController');
+module.exports = (app) => {
 
-    // todoList Routes
-    // app.route('/tasks')
-    //     .get(todoList.list)
-    //     .post(todoList.new);
+    var verifToken = require('./../middlewares/verifToken');
 
-    // app.route('/tasks/:taskId')
-    //     .get(todoList.read_a_task)
-    //     .put(todoList.update_a_task)
-    //     .delete(todoList.delete_a_task);
-
-    // app.get('/users', (req, res) => res.send('Welcome to ECS_REST_API with Express'));
-
-    var user = require('./../controllers/userController');
+    var userController = require('./../controllers/userController');
     app.route('/users')
-        .get(user.index)
-        .post(user.new);
+        .get(userController.getAllUsers)
+        .post(userController.register);
+
+    app.route('/users/:id')
+        .get(userController.viewUser)
+        .post(userController.updateUser)
+        .delete(userController.deleteUser);
+
     app.route('/login')
-        .post(user.login);
+        .post(userController.login);
 
-    var event = require('./../controllers/eventController');
+    var eventController = require('./../controllers/eventController');
     app.route('/events')
-        .get(event.index)
-        .post(event.new);
+        // .get(verifToken, eventController.index)
+        .get(verifToken, eventController.getAllEvents)
+        .post(eventController.new);
 
-    app.get('/toto', (req, res) => res.send('Welcome toto'));
-
-
-
+    app.route('/events/:id')
+        .get(eventController.viewEvent)
+        .post(eventController.updateEvent)
+        .delete(eventController.deleteEvent);
 
 }
