@@ -2,6 +2,8 @@
 
 module.exports = (app) => {
 
+    app.get('/', (req, res) => res.send('Welcome to ECS_REST_API with Express'));
+
     var verifToken = require('./../middlewares/verifToken');
 
     var userController = require('./../controllers/userController');
