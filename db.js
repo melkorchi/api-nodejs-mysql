@@ -18,7 +18,8 @@ var dbLink = mysql.createConnection({
 });
 */
 
-dbLink.connect(function(err) {
+// dbLink.connect(function(err) {
+dbLink.getConnection(function(err, connection) {
     if (err) {
         console.log('errrrrrrr');
         throw err;
