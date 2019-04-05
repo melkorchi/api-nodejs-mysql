@@ -164,6 +164,7 @@ Event.updateEventById = (id, obj, callback) => {
 
     // Utilisation de sqlstring
     // let sql = SqlString.format('UPDATE ?? SET ? WHERE `id` = ?', ['events', filtered, id]);
+    // let event =
     let sql = SqlString.format('UPDATE ?? SET ? WHERE `id` = ?', ['events', obj, id]);
     console.log('sql', sql);
 
