@@ -20,7 +20,7 @@ module.exports = (app) => {
         .post(userController.login);
 
     app.route('/events')
-        .get(verifToken, eventController.getAllEvents)
+        // .get(verifToken, eventController.getAllEvents)
         .get(eventController.getAllEvents)
         .post(eventController.new);
 
