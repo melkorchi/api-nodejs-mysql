@@ -6,6 +6,7 @@
 // var db = require('./../../db');
 const DataBaseConnection = require('./../../db2');
 const con = new DataBaseConnection('heroku');
+// const con = new DataBaseConnection('local');
 con.getConnection();
 const db = con.dbLink();
 
@@ -32,7 +33,7 @@ var Event = function(event) {
 
 // All Events
 Event.getAllEvents = (callback) => {
-    let sql = "SELECT e.ID_EVENT, d.NAME as discipline, p.name as participant, e.EPREUVE, e.EVENT_DATE, s.COMMUNE, s.LONGITUDE, s.LATTITUDE FROM `events` AS e ";
+    let sql = "SELECT e.ID_EVENT, d.NAME as discipline, p.name as participant, e.EPREUVE, e.EVENT_DATE, s.COMMUNE, s.LONGITUDE, s.LATTITUDE, s.NAME as site FROM `events` AS e ";
     sql += "INNER JOIN discipline AS d ";
     sql += "ON e.ID_DISCIPLINE = d.ID_DISCIPLINE ";
     sql += "INNER JOIN event_has_pays AS ehp ";
@@ -131,7 +132,7 @@ Event.insertInEventHasPays = (newEvent, callback) => {
 }
 
 Event.getEventById = (id, callback) => {
-    let sqlG = "SELECT e.ID_EVENT, d.NAME as discipline, p.name as participant, e.EPREUVE, e.EVENT_DATE, s.NAME, s.COMMUNE, s.LONGITUDE, s.LATTITUDE FROM `events` AS e ";
+    let sqlG = "SELECT e.ID_EVENT, d.NAME as discipline, p.name as participant, e.EPREUVE, e.EVENT_DATE, s.NAME as site, s.COMMUNE, s.LONGITUDE, s.LATTITUDE FROM `events` AS e ";
     sqlG += "INNER JOIN discipline AS d ";
     sqlG += "ON e.ID_DISCIPLINE = d.ID_DISCIPLINE ";
     sqlG += "INNER JOIN event_has_pays AS ehp ";

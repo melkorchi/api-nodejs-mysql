@@ -3,6 +3,7 @@
 // var db = require('./../../db');
 const DataBaseConnection = require('./../../db2');
 const con = new DataBaseConnection('heroku');
+// const con = new DataBaseConnection('local');
 con.getConnection();
 const db = con.dbLink();
 

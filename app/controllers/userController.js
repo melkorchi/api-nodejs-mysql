@@ -24,6 +24,7 @@ exports.getAllUsers = (request, response) => {
 // EndPoint /users (post) : handle create user (register)
 exports.register = (request, response) => {
     var newUser = new User(request.body);
+    console.log(newUser);
     //handles null error 
     if (!newUser.email || !newUser.password || !newUser.status) {
         response.status(400).send({ error: true, message: 'Bad request, please provide user/status' });

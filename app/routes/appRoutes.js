@@ -21,6 +21,7 @@ module.exports = (app) => {
 
     app.route('/events')
         .get(verifToken, eventController.getAllEvents)
+        .get(eventController.getAllEvents)
         .post(eventController.new);
 
     app.route('/events/:id')

@@ -56,7 +56,6 @@ module.exports = class MySqlDataBase {
         if (this._type == 'local') {
             this._dblink.connect(function(err) {
                 if (err) {
-                    console.log('errrrrrrr');
                     throw err;
                 } else {
                     console.log('lets go with localhost !!!');
@@ -65,7 +64,6 @@ module.exports = class MySqlDataBase {
         } else {
             this._dblink.getConnection(function(err, connection) {
                 if (err) {
-                    console.log('errrrrrrr');
                     throw err;
                 } else {
                     console.log('lets go with heroku !!!');
@@ -77,6 +75,5 @@ module.exports = class MySqlDataBase {
 
     display() {
         let url = "mysql://" + this.user + ":" + this.password + "@" + this.host + "/" + this.database;
-        console.log('Class de connection: ', url);
     }
 }
