@@ -27,13 +27,13 @@ var Event = function(event) {
     // NAME, COMMUNE, LONGITUDE, LATTITUDE
     this.commune = event.commune;
     this.site = event.site;
-    this.latittude = event.latittude;
+    this.lattitude = event.lattitude;
     this.longitude = event.longitude;
 }
 
 // All Events
 Event.getAllEvents = (callback) => {
-    let sql = "SELECT e.ID_EVENT, d.NAME as discipline, p.name as participant, e.EPREUVE, e.EVENT_DATE, s.COMMUNE, s.LONGITUDE, s.LATTITUDE, s.NAME as site FROM `events` AS e ";
+    let sql = "SELECT e.ID_EVENT, d.NAME as discipline, p.name as participant, e.EPREUVE as epreuve, e.EVENT_DATE as eventDate, s.COMMUNE as commune, s.LONGITUDE as longitude, s.LATTITUDE as lattitude, s.NAME as site FROM `events` AS e ";
     sql += "INNER JOIN discipline AS d ";
     sql += "ON e.ID_DISCIPLINE = d.ID_DISCIPLINE ";
     sql += "INNER JOIN event_has_pays AS ehp ";
